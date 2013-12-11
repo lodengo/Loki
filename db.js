@@ -1,6 +1,12 @@
-var db = module.exports = function db() {
+module.exports = require("./db/neo.js");
+
+var db = function db() {
 	
 };
+
+db.createCostFile = function(data, callback){
+	
+}
 
 db.getCost = function(file, id, callback){
 	

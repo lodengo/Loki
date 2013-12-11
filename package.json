@@ -10,7 +10,6 @@
 	"neo4j":"*",
 	"simple-basex":"*",		
 	"async": "*",
-	"xml2json":"*",
 	"mathjs": "*"	
   }
 }

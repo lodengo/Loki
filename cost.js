@@ -105,6 +105,10 @@ Cost.create = function(file, data, parentId, callback){
 	});	
 };
 
+Cost.createFile = function(data, callback){
+	db.createCostFile(data, callback);
+}
+
 
 
 
