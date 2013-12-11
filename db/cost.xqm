@@ -1,57 +1,113 @@
 module namespace cost = 'cost';
 
 declare updating function cost:createFile($data){
-  let $fileid:= random:uuid()
-  let $costId := random:uuid()
-  let $type := $data/type/text()
-  let $n := copy $n := doc('fees')//node()[name()=$type]
-  modify(
-    for $fee in $n//fee return    
-    insert node <fee><file>{$fileid}</file><costId>{$costId}</costId><costType>{$type}</costType><id>{random:uuid()}</id></fee>/node() into $fee
-  )
-  return $n
-  let $cost :=
-  <cost>
-  <id>{$costId}</id>
-  {$data/node()}
-  <fees>{$n/node()}</fees>
-  </cost>  
- 
+  let $fileid:= random:uuid() 
   return(     
-    db:create($fileid, $cost, $fileid),       
-    db:output(<result><file>{$fileid}</file><id>{$costId}</id></result>)
+    db:create($fileid, <file><id>{$fileid}</id></file>, $fileid),       
+    db:output(<result>{$fileid}</result>)
   )  
 };
 
-declare updating function cost:insertCost($data, $file as xs:string*, $parentid as xs:string*){
-  let $costId := random:uuid()
-  let $type := $data/type/text()
-  let $n := copy $n := doc('fees')//node()[name()=$type]
+declare function cost:getCost($file, $id){
+  copy $cost := doc($file)//cost[id=$id]
   modify(
-      for $fee in $n//fee return    
-      insert node <fee><file>{$file}</file><costId>{$costId}</costId><costType>{$type}</costType><id>{random:uuid()}</id></fee>/node() into $fee
+    insert node <file>{$file}</file> into $cost,
+    delete node $cost/fees,
+    delete node $cost/node()[name()='cost']
   )
-  return $n
-  let $cost :=
-  <cost>
-  <id>{$costId}</id>
-  {$data/node()}
-  <fees>{$n/node()}</fees>
-  </cost>
-  
-  let $parent := doc($file)//cost[id=$parentid] return(
-      insert node $cost into $parent,     
-      db:output(<result><id>{$costId}</id></result>) 
-  )   
+  return $cost
 };
 
-declare function cost:feesToFlushOnCostCreate($file, $costId){
+declare updating function cost:insertCost($file, $data, $parentId){
+  let $cost :=
+  <cost>
+  <id>{random:uuid()}</id>
+  <file>{$file}</file>
+  {$data/node()} 
+  <fees></fees>
+  </cost>
+  
+  let $parent := doc($file)//cost[id=$parentId] return
+  if($parent) then (insert node $cost into $parent,  db:output($cost) )
+  else (insert node $cost into doc($file), db:output($cost))   
+};
+
+declare updating function cost:deleteCost($file, $costId){
+  delete node doc($file)//cost[id=$costId]
+};
+
+declare updating function cost:setCostProperty($file, $id, $prop, $value){
+  let $node := doc($file)//cost[id=$id]/node()[name()=$prop]
+  return if($node) then replace value of node $node with $value
+  else insert node element {$prop} {$value} into doc($file)//cost[id=$id]
+};
+
+declare updating function cost:deleteCostProperty($file, $id, $prop){
+  delete node doc($file)//cost[id=$id]/node()[name()=$prop]
+};
+
+declare function cost:feesToFlushOnCostCreate($file, $costId, $type){
   let $cost := doc($file)//cost[id=$costId]
   let $cost_fees := $cost//fee 
   let $cost_parent_fees_cc := $cost/../fees//fee[matches(feeExpr, "cc")]
   let $cost_sibling := $cost/../cost[id != $costId]
   let $cost_sibling_fees_cs := $cost_sibling/fees//fee[matches(feeExpr, "cs")]
   return <fees>{($cost_fees,$cost_parent_fees_cc,$cost_sibling_fees_cs)}</fees>
+};
+
+declare function cost:feesToFlushOnCostUpdate($file, $costId, $type, $key){
+  ()
+};
+
+declare function cost:feesToFlushOnCostDelete($file, $costId, $type){
+  ()
+};
+
+declare function cost:getFee($file, $id){
+  copy $fee := doc($file)//fee[id=$id]
+  modify(delete node $fee/fee)
+  return $fee
+};
+
+declare updating function cost:createFee($file, $data, $costId, $costType, $parentId){
+  let $fee := 
+  <fee>
+  <file>{$file}</file>
+  <costId>{$costId}</costId>
+  <costType>{$costType}</costType>
+  <id>{random:uuid()}</id>
+  {$data/node()}
+  </fee>
+  
+  let $parent := doc($file)//fee[id=$parentId] return
+  if($parent) then (insert node $fee into $parent,  db:output($fee) )
+  else (insert node $fee into doc($file)//cost[id=$costId]/fees, db:output($fee))   
+};
+
+declare updating function cost:setFeeProperty($file, $id, $prop, $value){
+  let $node := doc($file)//fee[id=$id]/node()[name()=$prop]
+  return if($node) then replace value of node $node with $value
+  else insert node element {$prop} {$value} into doc($file)//fee[id=$id]
+};
+
+declare updating function cost:deleteFeeProperty($file, $id, $prop){
+  delete node doc($file)//fee[id=$id]/node()[name()=$prop]
+};
+
+declare updating function cost:deleteFee($file, $id){
+  delete node doc($file)//fee[id=$id]
+};
+
+declare updating function cost:setFeeResult($file, $id, $result){
+  replace value of node doc($file)//fee[id=$id]/feeResult with $result
+};
+
+declare function cost:feesAdj($file, $ids){
+  ()
+};
+
+declare function cost:feesToFlushOnFeeCreate($file, $costId, $type, $feeName){
+  ()
 };
 
 declare updating function cost:createRefsTo($file, $fromFeeId, $toIds){
@@ -80,19 +136,10 @@ declare updating function cost:removeRefsTo($file, $fromFeeId, $toIds){
   )  
 };
 
-declare updating function cost:setFeeResult($file, $feeId, $result){
-  replace value of node doc($file)//fee[id=$feeId]/feeResult with $result
-};
-
-declare function cost:getFee($file, $id){
-  doc($file)//fee[id=$id]
-};
-
-declare function cost:getFees($file, $ids){
-  <fees>{
-  for $id in $ids/id/text() return
-  doc($file)//fee[id=$id]
-  }</fees>
+declare function cost:feeRefedToIds($file, $id){
+  <result>
+  {doc($file)//fee[id=$id]/refTo}
+  </result>
 };
 
 declare function cost:_C($file, $costId, $prop){

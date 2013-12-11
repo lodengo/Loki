@@ -56,83 +56,85 @@ db.query = function(func, args, callback) {
 }
 
 db.createCostFile = function(data, callback){
-	
+	this.query('createFile', 0, callback);
 }
 
 db.getCost = function(file, id, callback){
-	
+	this.query('getCost', [file, id], callback);
 }
 
 db.insertCost = function(file, data, parentId, callback){
-	
+	parentId = parentId || '';
+	this.query('insertCost', [file, util.json2xml({cost : data}), parentId], callback);
 }
 
 db.deleteCost = function(file, costId, callback){
-	
+	this.query('deleteCost', [file, costId], callback);
 }
 
 db.setCostProperty = function(file, id, prop, value, callback){
-	
+	this.query('setCostProperty', [file, id, prop, value], callback);
 }
 
 db.deleteCostProperty = function(file, id, prop, callback){
-	
+	this.query('deleteCostProperty', [file, id, prop], callback);
 }
 
 db.feesToFlushOnCostCreate = function(file, costId, type, callback){
-	
+	this.query('feesToFlushOnCostCreate', [file, costId, type], callback);
 }
 
 db.feesToFlushOnCostUpdate = function(file, costId, type, key, callback){
-	
+	this.query('feesToFlushOnCostUpdate', [file, costId, type, key], callback);
 }
 
 db.feesToFlushOnCostDelete = function(file, costId, type, callback){
-	
+	this.query('feesToFlushOnCostDelete', [file, costId, type], callback);
 }
 
 db.getFee = function(file, id, callback){
-	
+	this.query('getFee', [file, id], callback);
 }
 
 db.createFee = function(file, data, costId, costType, parentId, callback){
-	
+	parentId = parentId || '';
+	this.query('createFee', [file, data, costId, costType, parentId], callback);
 }
 
 db.setFeeProperty = function(file, id, prop, value, callback){
-	
+	this.query('setFeeProperty', [file, id, prop, value], callback);
 }
 
 db.deleteFeeProperty = function(file, id, prop, callback){
-	
+	this.query('deleteFeeProperty', [file, id, prop], callback);
 }
 
 db.deleteFee = function(file, id, callback){
-	
+	this.query('deleteFee', [file, id], callback);
 }
 
 db.setFeeResult = function(file, id, feeResult, callback){
-	
+	this.query('setFeeResult', [file, id, feeResult], callback);
 }
 
 db.feesAdj = function(file, ids, callback){
-	
+	this.query('feesAdj', [file, ids], callback);
 }
 
 db.feesToFlushOnFeeCreate = function(file, costId, type, feeName, callback){
-	
+	this.query('feesToFlushOnFeeCreate', [file, costId, type, feeName], callback);
 }
 
 db.createRefsTo = function(file, id, toIds, callback){
-	
+	this.query('createRefsTo', [file, id, toIds], callback);
 }
 
 db.removeRefsTo = function(file, id, toIds, callback){
-	
+	this._exec('removeRefsTo', [file, id, toIds], callback);
 }
 
 db.feeRefedToIds = function(file, id, callback){
-	
+	this._exec('feeRefedToIds', [file, id], callback);
 }
 /////////////////////////////////////////////////////////////////////
 function _cb(err, data, getId, callback){
