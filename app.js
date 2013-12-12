@@ -126,6 +126,7 @@ Tester.prototype.modGcl = function(callback){
 	var nid = modQd ? me.qd.random() : me.de.random();
 	if(!nid){return callback(null);}
 	var gcl = Math.random() * 1000;
+	
 	Api.updateCost(me.file, nid, 'quantity', gcl, function(err, res){
 		callback(err);
 	});
@@ -138,6 +139,7 @@ Tester.prototype.delNode = function(callback){
 	var nid = delQd ? me.qd.random() : me.de.random();
 	if(!nid){return callback(null);}
 	Api.deleteCost(me.file, nid, function(err, res){
+		delQd ? me.qd.remove(nid) : me.de.remove(nid);
 		callback(err);
 	});
 }
@@ -198,9 +200,15 @@ function run(callback){
 	step(actor, actions, 0, callback);
 }
 
-run(function(){
-	console.log('done, info:');
-	console.log(stats);	
+//run(function(){
+//	console.log('done, info:');
+//	console.log(stats);	
+//});
+
+var db = require("./db/mongo.js");
+//console.log(db);
+db.getCost('', '52a96d2521e385d650c42293', function(err, cost){
+	console.log([err, cost]);
 });
 
 

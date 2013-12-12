@@ -112,7 +112,7 @@ db.feesToFlushOnCostCreate = function(file, costId, type, callback){
 	});	
 }
 
-db.feesToFlushOnCostUpdate = function(file, costId, type, key, callback){
+db.feesToFlushOnCostUpdate = function(file, costId, type, prop, callback){
 	var me = this;
 	var query = 'start n=node({id}) match n-[:fee|feechild*]->fees where fees.feeExpr=~".*cas\\\\({{prop}}\\\\)|c\\\\({{prop}}\\\\).*" return fees';
 	me.query(query, {id: costId, prop:prop}, function(err, data){

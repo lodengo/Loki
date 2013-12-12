@@ -68,6 +68,13 @@ Array.prototype.diff =
     return a.unique();
  };
  
+ Array.prototype.remove = function(element) {
+	var idx = this.indexOf(element);
+	if(idx != -1){
+		this.splice(idx, 1);
+	}
+ };
+ 
  Array.prototype.random = function() {
 	 var len = this.length;
 	 var idx = Math.floor(Math.random() * len);

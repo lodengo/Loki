@@ -10,8 +10,7 @@ declare updating function cost:createFile($data){
 
 declare function cost:getCost($file, $id){
   copy $cost := doc($file)//cost[id=$id]
-  modify(
-    insert node <file>{$file}</file> into $cost,
+  modify(    
     delete node $cost/fees,
     delete node $cost/node()[name()='cost']
   )

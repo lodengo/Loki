@@ -12,6 +12,7 @@
 	"mongodb":"*",	
 	"xml2json":"*",
 	"async": "*",
+	"generic-pool": "*",
 	"mathjs": "*"	
   }
 }

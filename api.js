@@ -42,7 +42,7 @@ Api.createCost = function(file, data, parentId, callback) {
 }
 
 Api.updateCost = function(file, id, key, value, callback) {
-	var me = this;
+	var me = this; 
 	Cost.get(file, id, function(err, cost) {
 		cost.update(key, value, function(err, res) {
 			cost.feesToFlushOnUpdate(key, value, function(err, fees) {

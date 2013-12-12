@@ -70,7 +70,7 @@ db.query = function(func, args, col, one, callback) {
 			data = one ? data : [].concat(data);
 		}
 		
-		//console.dir(query);	 console.log(data);
+		//console.dir(query);	 //console.log(data);
 		callback && callback(err, data);
 	});
 }
@@ -92,7 +92,7 @@ db.deleteCost = function(file, costId, callback){
 	this.query('deleteCost', [file, costId], null, true,callback);
 }
 
-db.setCostProperty = function(file, id, prop, value, callback){
+db.setCostProperty = function(file, id, prop, value, callback){console.log([file, id, prop, value]);
 	this.query('setCostProperty', [file, id, prop, value], null, true,callback);
 }
 
