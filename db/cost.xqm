@@ -48,37 +48,52 @@ declare updating function cost:deleteCostProperty($file, $id, $prop){
 
 declare function cost:feesToFlushOnCostCreate($file, $costId, $type){
   let $cost := doc($file)//cost[id=$costId]
-  let $cost_fees := $cost//fee 
-  let $cost_parent_fees_cc := $cost/../fees//fee[matches(feeExpr, "cc")]
+  let $cost_fees := $cost/fees//fee 
+  let $cost_parent_fees_cc := $cost/../fees//fee[matches(feeExpr, concat("cc.?\(", $type))]
   let $cost_sibling := $cost/../cost[id != $costId]
   let $cost_sibling_fees_cs := $cost_sibling/fees//fee[matches(feeExpr, "cs")]
   return <fees>{($cost_fees,$cost_parent_fees_cc,$cost_sibling_fees_cs)}</fees>
 };
 
 declare function cost:feesToFlushOnCostUpdate($file, $costId, $type, $key){
-  ()
+  let $cost := doc($file)//cost[id=$costId]
+  let $cost_fees := $cost/fees//fee[matches(feeExpr, concat("cas\(", $key, "|c\(", $key))]
+  let $cost_parent_fees := $cost/../fees//fee[matches(feeExpr, concat("cc\(", $type, ",", $key))]
+  let $cost_sibling := $cost/../cost[id != $costId]
+  let $cost_sibling_fees := $cost_sibling/fees//fee[matches(feeExpr, concat("cs\(", $key))]
+  let $cost_descendant_fees := $cost//cost/fees/fee[matches(feeExpr, concat("cas\(", $key))]
+  return <fees>{($cost_fees,$cost_parent_fees, $cost_sibling_fees, $cost_descendant_fees)}</fees>
 };
 
 declare function cost:feesToFlushOnCostDelete($file, $costId, $type){
-  ()
+  let $cost := doc($file)//cost[id=$costId]
+  let $cost_parent_fees := $cost/../fees//fee[matches(feeExpr, concat("cc\(", $type))]
+  let $cost_sibling := $cost/../cost[id != $costId]
+  let $cost_sibling_fees := $cost_sibling/fees//fee[matches(feeExpr, "cs\(")]
+  return <fees>{($cost_parent_fees, $cost_sibling_fees)}</fees>
 };
 
 declare function cost:getFee($file, $id){
   copy $fee := doc($file)//fee[id=$id]
-  modify(delete node $fee/fee)
+  modify(delete node $fee/fee, delete node $fee/refTo, delete node $fee/refFrom)
   return $fee
 };
 
 declare updating function cost:createFee($file, $data, $costId, $costType, $parentId){
-  let $fee := 
-  <fee>
-  <file>{$file}</file>
-  <costId>{$costId}</costId>
-  <costType>{$costType}</costType>
-  <id>{random:uuid()}</id>
-  {$data/node()}
-  </fee>
-  
+  let $info := <info>
+   <file>{$file}</file>
+   <costId>{$costId}</costId>
+   <costType>{$costType}</costType></info>
+   
+  let $fee := copy $fee := $data
+  modify(
+    for $fe in $fee//fee return( 
+    insert node <id>{random:uuid()}</id> into $fe,
+    insert node $info/node() into $fe
+    )
+  )
+  return $fee/fee
+    
   let $parent := doc($file)//fee[id=$parentId] return
   if($parent) then (insert node $fee into $parent,  db:output($fee) )
   else (insert node $fee into doc($file)//cost[id=$costId]/fees, db:output($fee))   
@@ -103,11 +118,24 @@ declare updating function cost:setFeeResult($file, $id, $result){
 };
 
 declare function cost:feesAdj($file, $ids){
-  ()
+  <result>{
+    for $id in $ids/id/text()
+    let $fee := doc($file)//fee[id=$id] return
+    <adj>
+     {$fee/id}
+     {$fee/refTo}
+     {$fee/refFrom}  
+    </adj>  
+  }</result>
 };
 
 declare function cost:feesToFlushOnFeeCreate($file, $costId, $type, $feeName){
-  ()
+  let $cost := doc($file)//cost[id=$costId]
+  let $cost_fees := $cost/fees//fee[matches(feeExpr, concat("cf\(", $feeName))]
+  let $cost_parent_fees := $cost/../fees//fee[matches(feeExpr, concat("ccf\(", $type, ",", $feeName))]
+  let $cost_sibling := $cost/../cost[id != $costId]
+  let $cost_sibling_fees := $cost_sibling/fees//fee[matches(feeExpr, concat("csf\(", $feeName))]
+  return <fees>{($cost_fees,$cost_parent_fees, $cost_sibling_fees)}</fees>
 };
 
 declare updating function cost:createRefsTo($file, $fromFeeId, $toIds){

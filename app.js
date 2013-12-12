@@ -184,14 +184,15 @@ function step(actor, actions, i, callback){
 function run(callback){	
 	var actions = ['createFile'];
 	arrPush(actions, "createZtgc", 1);
-//	arrPush(actions, "createDXgc", 2);
-//	arrPush(actions, "createDwgc", 4);
-//	arrPush(actions, "createFbfx", 8);	
-//	arrPush(actions, "createQd", 16);	
-//	arrPush(actions, "createDe", 32);	
-//	arrPush(actions, "createGlj", 100);	
-	//arrPush(actions, "modGcl", 5);
-	//arrPush(actions, "delNode", 2);	
+	arrPush(actions, "createDXgc", 2);
+	arrPush(actions, "createDwgc", 4);
+	arrPush(actions, "createFbfx", 8);	
+	arrPush(actions, "createQd", 16);	
+	arrPush(actions, "createDe", 32);	
+	arrPush(actions, "createGlj", 32);	
+	arrPush(actions, "modGcl", 5);
+	arrPush(actions, "delNode", 2);	
+	arrPush(actions, "createGlj", 32);
 	
 	var actor = new Tester();
 	step(actor, actions, 0, callback);

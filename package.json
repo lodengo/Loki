@@ -8,7 +8,8 @@
   "dependencies": {
     "express": "*",    
 	"neo4j":"*",
-	"simple-basex":"*",		
+	"simple-basex":"*",	
+	"mongodb":"*",	
 	"xml2json":"*",
 	"async": "*",
 	"mathjs": "*"	

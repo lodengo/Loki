@@ -1,4 +1,5 @@
 var util = require("../util.js");
+var async = require('async');
 var basex = require('simple-basex');
 var _db = new basex.Session({
 	host : 'localhost',
@@ -117,7 +118,7 @@ db.getFee = function(file, id, callback){
 
 db.createFee = function(file, data, costId, costType, parentId, callback){
 	parentId = parentId || '';
-	this.query('createFee', [file, util.json2xml({fee:data}), costId, costType, parentId], null, true,callback);
+	this.query('createFee', [file, util.json2xml({fees:{fee:data}}), costId, costType, parentId], null, true,callback);
 }
 
 db.setFeeProperty = function(file, id, prop, value, callback){
@@ -137,7 +138,25 @@ db.setFeeResult = function(file, id, feeResult, callback){
 }
 
 db.feesAdj = function(file, ids, callback){
-	this.query('feesAdj', [file, ids], null, true,callback);
+	this._feesAdj(file, ids, {}, callback);
+}
+
+db._feesAdj = function(file, ids, adj, callback){
+	var me = this;
+	me.query('feesAdj', [file, util.json2xml({ids:{id:ids}})], 'adj', false,  function(err, data){		
+		async.concat(data, function(r, cb){
+			var id = r.id;
+			var tos = r.refTo ? [].concat(r.refTo) : [];
+			adj[id] = adj[id] ? adj[id].concat(tos) : tos;
+			cb(null, r.refFrom? r.refFrom : []);
+		}, function(err, froms){
+			if(froms.length > 0){
+				me._feesAdj(file, froms, adj, callback);
+			}else{
+				callback(err, adj);
+			}
+		});
+	});
 }
 
 db.feesToFlushOnFeeCreate = function(file, costId, type, feeName, callback){
