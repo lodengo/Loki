@@ -1,0 +1,30 @@
+mongodb
+
+cost:{
+	nodeType: 'cost',
+	file: '',
+	id:'',
+	parentId:'',
+	idPath:[rootid, ..., parentId],
+	type:'',
+	any:''	
+	refFrom: [feeId, feeId...]
+}
+
+fee:{
+	nodeType: 'fee',
+	file: '',
+	id:'',
+	parentId:'',
+	idPath:[rootid, ..., parentId],
+	costId:'',
+	costParentId:'',
+	costIdPath:[],	
+	costType: '',
+	feeName:'',
+	feeExpr:'',
+	feeResult:'',
+	any:'',
+	refTo: [id, id, id,],
+	refFrom: [feeId, feeId, ...],	
+}

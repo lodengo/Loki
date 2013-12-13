@@ -92,7 +92,7 @@ db.deleteCost = function(file, costId, callback){
 	this.query('deleteCost', [file, costId], null, true,callback);
 }
 
-db.setCostProperty = function(file, id, prop, value, callback){console.log([file, id, prop, value]);
+db.setCostProperty = function(file, id, prop, value, callback){
 	this.query('setCostProperty', [file, id, prop, value], null, true,callback);
 }
 
@@ -100,15 +100,24 @@ db.deleteCostProperty = function(file, id, prop, callback){
 	this.query('deleteCostProperty', [file, id, prop], null, true,callback);
 }
 
-db.feesToFlushOnCostCreate = function(file, costId, type, callback){
+db.feesToFlushOnCostCreate = function(costData, callback){
+	var file = costData.file;
+	var costId = costData.id;
+	var type = costData.type;
 	this.query('feesToFlushOnCostCreate', [file, costId, type], 'fee', false, callback);
 }
 
-db.feesToFlushOnCostUpdate = function(file, costId, type, key, callback){
+db.feesToFlushOnCostUpdate = function(costData, key, callback){
+	var file = costData.file;
+	var costId = costData.id;
+	var type = costData.type;
 	this.query('feesToFlushOnCostUpdate', [file, costId, type, key], 'fee', false, callback);
 }
 
-db.feesToFlushOnCostDelete = function(file, costId, type, callback){
+db.feesToFlushOnCostDelete = function(costData, callback){
+	var file = costData.file;
+	var costId = costData.id;
+	var type = costData.type;
 	this.query('feesToFlushOnCostDelete', [file, costId, type], 'fee', false, callback);
 }
 
@@ -116,8 +125,10 @@ db.getFee = function(file, id, callback){
 	this.query('getFee', [file, id], null, true,callback);
 }
 
-db.createFee = function(file, data, costId, costType, parentId, callback){
+db.createFee = function(file, data, costData, parentId, callback){
 	parentId = parentId || '';
+	var costId = costData.id;
+	var costType = costData.type;
 	this.query('createFee', [file, util.json2xml({fees:{fee:data}}), costId, costType, parentId], null, true,callback);
 }
 
@@ -159,21 +170,31 @@ db._feesAdj = function(file, ids, adj, callback){
 	});
 }
 
-db.feesToFlushOnFeeCreate = function(file, costId, type, feeName, callback){
+db.feesToFlushOnFeeCreate = function(feeData, callback){
+	var file = feeData.file;
+	var costId = feeData.costId;
+	var type = feeData.CostType;
+	var feeName = feeData.feeName;
 	this.query('feesToFlushOnFeeCreate', [file, costId, type, feeName], 'fee', false,callback);
 }
 
-db.createRefsTo = function(file, id, toIds, callback){
+db.createRefsTo = function(feeData, toIds, callback){
+	var file = feeData.file;
+	var id = feeData.id;
 	if(toIds.length == 0) return callback(null, null);
 	this.query('createRefsTo', [file, id, util.json2xml({ids:{id:toIds}})], null, true,callback);
 }
 
-db.removeRefsTo = function(file, id, toIds, callback){
+db.removeRefsTo = function(feeData, toIds, callback){
+	var file = feeData.file;
+	var id = feeData.id;
 	if(toIds.length == 0) return callback(null, null);
 	this.query('removeRefsTo', [file, id, util.json2xml({ids:{id:toIds}})], null, true,callback);
 }
 
-db.feeRefedToIds = function(file, id, callback){
+db.feeRefedToIds = function(feeData, callback){
+	var file = feeData.file;
+	var id = feeData.id;
 	this.query('feeRefedToIds', [file, id], 'refTo', false, callback);
 }
 /////////////////////////////////////////////////////////////////////
@@ -184,44 +205,58 @@ function _cb(err, data, getId, callback){
 	callback(err, values);
 };
 
-db._C = function(file, costId, prop, getId, callback){
+db._C = function(feeData, prop, getId, callback){
+	var file = feeData.file;
+	var costId = feeData.costId;
 	this.query('_C', [file, costId, prop], 'result', false, function(err, data){
 		_cb(err, data, getId,  callback);
 	});
 }
 
-db._CF = function(file, costId, feeName, getId, callback) {
+db._CF = function(feeData, feeName, getId, callback) {
+	var file = feeData.file;
+	var costId = feeData.costId;
 	this.query('_CF', [file, costId, feeName],'result', false,function(err, data){	
 		_cb(err, data, getId, callback);
 	});
 }
 
 
-db._CC = function(file, costId, type, prop, getId, callback) {
+db._CC = function(feeData, type, prop, getId, callback) {
+	var file = feeData.file;
+	var costId = feeData.costId;
 	this.query('_CC', [file, costId, type, prop], 'result', false, function(err, data){
 		_cb(err, data, getId, callback);
 	});
 }
 
-db._CCF = function(file, costId, type, feeName, getId, callback) {
+db._CCF = function(feeData, type, feeName, getId, callback) {
+	var file = feeData.file;
+	var costId = feeData.costId;
 	this.query('_CCF', [file, costId, type, feeName], 'result', false,function(err, data){
 		_cb(err, data, getId, callback);
 	});
 }
 
-db._CS = function(file, costId, prop, getId, callback) {
+db._CS = function(feeData, prop, getId, callback) {
+	var file = feeData.file;
+	var costId = feeData.costId;
 	this.query('_CS', [file, costId, prop], 'result', false, function(err, data){
 		_cb(err, data, getId, callback);
 	});
 }
 
-db._CSF = function(file, costId, feeName, getId, callback) {
+db._CSF = function(feeData, feeName, getId, callback) {
+	var file = feeData.file;
+	var costId = feeData.costId;
 	this.query('_CSF', [file, costId, feeName], 'result', false, function(err, data){
 		_cb(err, data, getId, callback);
 	});
 }
 
-db._CAS = function(file, costId, prop, getId, callback) {
+db._CAS = function(feeData, prop, getId, callback) {
+	var file = feeData.file;
+	var costId = feeData.costId;
 	this.query('_CAS', [file, costId, prop], 'result', false, function(err, data){
 		_cb(err, data, getId, callback);
 	});

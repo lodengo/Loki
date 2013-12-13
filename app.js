@@ -192,24 +192,19 @@ function run(callback){
 	arrPush(actions, "createQd", 16);	
 	arrPush(actions, "createDe", 32);	
 	arrPush(actions, "createGlj", 32);	
-	arrPush(actions, "modGcl", 5);
-	arrPush(actions, "delNode", 2);	
-	arrPush(actions, "createGlj", 32);
+//	arrPush(actions, "modGcl", 5);
+//	arrPush(actions, "delNode", 2);	
+//	arrPush(actions, "createGlj", 32);
 	
 	var actor = new Tester();
 	step(actor, actions, 0, callback);
 }
 
-//run(function(){
-//	console.log('done, info:');
-//	console.log(stats);	
-//});
-
-var db = require("./db/mongo.js");
-//console.log(db);
-db.getCost('', '52a96d2521e385d650c42293', function(err, cost){
-	console.log([err, cost]);
+run(function(){
+	console.log('done, info:');
+	console.log(stats);	
 });
+
 
 
 

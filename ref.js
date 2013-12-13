@@ -35,37 +35,31 @@ Ref.prototype.c = function(pName, callback){
 }
 
 Ref.prototype.cf = function(feeName, callback){	
-	var costId = this._fee.costId;
-	var file = this._fee.file;
-	db._CF(file, costId, feeName, true, callback);	
+	var feeData = this._fee._data;
+	db._CF(feeData, feeName, true, callback);	
 }
 
 Ref.prototype.cc = function(costType, pName, callback){
-	var costId = this._fee.costId;
-	var file = this._fee.file;
-	db._CC(file, costId, costType, pName, true, callback);			
+	var feeData = this._fee._data;
+	db._CC(feeData, costType, pName, true, callback);			
 }
 
 Ref.prototype.ccf = function(costType, feeName, callback){
-	var costId = this._fee.costId;
-	var file = this._fee.file;
-	db._CCF(file, costId, costType, feeName, true, callback);	
+	var feeData = this._fee._data;
+	db._CCF(feeData, costType, feeName, true, callback);	
 }
 
 Ref.prototype.cs = function(prop, callback){
-	var costId = this._fee.costId;	
-	var file = this._fee.file;
-	db._CS(file, costId, prop, true, callback);		
+	var feeData = this._fee._data;
+	db._CS(feeData, prop, true, callback);		
 }
 
 Ref.prototype.csf = function(feeName, callback){
-	var costId = this._fee.costId;
-	var file = this._fee.file;
-	db._CSF(file, costId,  feeName, true, callback);	
+	var feeData = this._fee._data;
+	db._CSF(feeData, feeName, true, callback);	
 }
 
 Ref.prototype.cas = function(prop, callback){
-	var costId = this._fee.costId;
-	var file = this._fee.file;
-	db._CAS(file, costId,  prop, true, callback);	
+	var feeData = this._fee._data;
+	db._CAS(feeData, prop, true, callback);	
 }

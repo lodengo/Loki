@@ -1,6 +1,6 @@
-module.exports = require("./db/neo.js");
+//module.exports = require("./db/neo.js");
 //module.exports = require("./db/basex.js");
-//module.exports = require("./db/mongo.js");
+module.exports = require("./db/mongo.js");
 
 var db = function db() {
 	
@@ -30,15 +30,15 @@ db.deleteCostProperty = function(file, id, prop, callback){
 	
 }
 
-db.feesToFlushOnCostCreate = function(file, costId, type, callback){
+db.feesToFlushOnCostCreate = function(costData, callback){
 	
 }
 
-db.feesToFlushOnCostUpdate = function(file, costId, type, key, callback){
+db.feesToFlushOnCostUpdate = function(costData, key, callback){
 	
 }
 
-db.feesToFlushOnCostDelete = function(file, costId, type, callback){
+db.feesToFlushOnCostDelete = function(costData, callback){
 	
 }
 
@@ -46,7 +46,7 @@ db.getFee = function(file, id, callback){
 	
 }
 
-db.createFee = function(file, data, costId, costType, parentId, callback){
+db.createFee = function(file, data, costData, parentId, callback){
 	
 }
 
@@ -70,46 +70,46 @@ db.feesAdj = function(file, ids, callback){
 	
 }
 
-db.feesToFlushOnFeeCreate = function(file, costId, type, feeName, callback){
+db.feesToFlushOnFeeCreate = function(feeData, callback){
 	
 }
 
-db.createRefsTo = function(file, id, toIds, callback){
+db.createRefsTo = function(feeData, toIds, callback){
 	
 }
 
-db.removeRefsTo = function(file, id, toIds, callback){
+db.removeRefsTo = function(feeData, toIds, callback){
 	
 }
 
-db.feeRefedToIds = function(file, id, callback){
+db.feeRefedToIds = function(feeData, callback){
 	
 }
 /////////////////////////////////////////////////////////////////////
-db._C = function(file, costId, prop, getId, callback){
+db._C = function(feeData, prop, getId, callback){
 	
 }
 
-db._CF = function(file, costId, feeName, getId, callback) {
+db._CF = function(feeData, feeName, getId, callback) {
 	
 }
 
-db._CC = function(file, costId, type, prop, getId, callback) {
+db._CC = function(feeData, type, prop, getId, callback) {
 	
 }
 
-db._CCF = function(file, costId, type, feeName, getId, callback) {
+db._CCF = function(feeData, type, feeName, getId, callback) {
 	
 }
 
-db._CS = function(file, costId, prop, getId, callback) {
+db._CS = function(feeData, prop, getId, callback) {
 	
 }
 
-db._CSF = function(file, costId, feeName, getId, callback) {
+db._CSF = function(feeData, feeName, getId, callback) {
 	
 }
 
-db._CAS = function(file, costId, prop, getId, callback) {
+db._CAS = function(feeData, prop, getId, callback) {
 	
 }

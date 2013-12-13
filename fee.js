@@ -2,62 +2,58 @@ var async = require('async');
 var Ref = require("./ref.js");
 var db = require("./db.js");
 
-var Fee = module.exports = function Fee(_node) {
-	this._node = _node;
+var Fee = module.exports = function Fee(_data) {
+	this._data = _data;
 }
 
 Object.defineProperty(Fee.prototype, 'file', {
 	get : function() {
-		return this._node.file;
+		return this._data.file;
 	}
 });
 
 Object.defineProperty(Fee.prototype, 'costId', {
 	get : function() {
-		return this._node.costId;
+		return this._data.costId;
 	}
 });
 
 Object.defineProperty(Fee.prototype, 'costType', {
 	get : function() {
-		return this._node.costType;
+		return this._data.costType;
 	}
 });
 
 Object.defineProperty(Fee.prototype, 'id', {
 	get : function() {
-		return this._node.id;
+		return this._data.id;
 	}
 });
 
 Object.defineProperty(Fee.prototype, 'feeName', {
 	get : function() {
-		return this._node.feeName;
+		return this._data.feeName;
 	}
 });
 
 Object.defineProperty(Fee.prototype, 'feeExpr', {
 	get : function() {
-		return this._node.feeExpr+"";
+		return this._data.feeExpr+"";
 	}
 });
 
 Object.defineProperty(Fee.prototype, 'feeResult', {
 	get : function() {
-		return this._node.feeResult;
+		return this._data.feeResult;
 	},
 	set: function (result) {
-		this._node.feeResult = result;
+		this._data.feeResult = result;
 	}
 });
 
 Fee.prototype.feesToFlushOnCreate = function(callback) {
-	var me = this;
-	var costId = me.costId;
-	var type = me.costType;
-	var feeName = me.feeName;
-	var file = me.file;
-	db.feesToFlushOnFeeCreate(file, costId, type, feeName, function(err, nfees){
+	var me = this;	
+	db.feesToFlushOnFeeCreate(me._data, function(err, nfees){
 		async.map(nfees, function(nfee, cb){cb(null, new Fee(nfee));}, callback);
 	});
 }
@@ -83,21 +79,18 @@ Fee.prototype.feesToFlushOnDelete = function(callback) {
 }
 
 Fee.prototype.createRefTo = function(toIds, callback) {
-	var id = this.id;
-	var file = this.file;
-	db.createRefsTo(file, id, toIds, callback);
+	var me = this;
+	db.createRefsTo(me._data, toIds, callback);
 }
 
 Fee.prototype.removeRefsTo = function(toIds, callback) {
-	var id = this.id;
-	var file = this.file;
-	db.removeRefsTo(file, id, toIds, callback);
+	var me = this;
+	db.removeRefsTo(me._data, toIds, callback);
 }
 
 Fee.prototype.refedToIds = function(callback) {
-	var id = this.id;
-	var file = this.file;
-	db.feeRefedToIds(file, id, callback);
+	var me = this;
+	db.feeRefedToIds(me._data, callback);
 }
 
 Fee.prototype.refToIdsByExpr = function(callback) {
@@ -112,7 +105,7 @@ Fee.prototype.buildRef = function(callback) {
 	var me = this;
 	me.refedToIds(function(err, refedToIds) {
 		me.refToIdsByExpr(function(err, refToIdsByExpr){	
-			//console.log(['ref', me.costType, me.feeName, refedToIds, refToIdsByExpr]);			
+			console.log(['ref', me.costType, me.feeName, refedToIds, refToIdsByExpr]);			
 			me.removeRefsTo(refedToIds.diff(refToIdsByExpr), function(err){
 				me.createRefTo(refToIdsByExpr.diff(refedToIds), callback);
 			});
@@ -124,16 +117,16 @@ Fee.prototype.update = function(prop, value, callback) {
 	var me = this;
 	var id = me.id;
 	var file = me.file;
-	var hasProp = me._node.hasOwnProperty(property);
+	var hasProp = me._data.hasOwnProperty(property);
 	var valueNotNull = (value !== undefined) && (value !== null);
 
-	if (hasProp && value == me._node[prop]) {
+	if (hasProp && value == me._data[prop]) {
 		return callback(null, 0);
 	} else {
 		if (hasProp && !valueNotNull) { 
 			db.deleteFeeProperty(file, id, prop, callback);
 		} else if (valueNotNull) { 
-			if ((!hasProp) || (value != me._node[prop])) {
+			if ((!hasProp) || (value != me._data[prop])) {
 				db.setFeeProperty(file, id, prop, value, callback);
 			}
 		}
@@ -153,6 +146,6 @@ Fee.get = function(file, id, callback) {
 	});
 }
 
-Fee.create = function(file, data, costId, costType, parentId, callback) {
-	db.createFee(file, data, costId, costType, parentId, callback);
+Fee.create = function(file, data, costData, parentId, callback) {
+	db.createFee(file, data, costData, parentId, callback);
 }
