@@ -53,7 +53,7 @@ db.insertCost = function(file, data, parentId, callback) {
 		if (parentId) {
 			data.parentId = parentId;
 			me.getCost(file, parentId, function(err, parent) {
-				data.idPath = parent.idPath.push(parentId);
+				data.idPath = parent.idPath.concat(parentId);
 				_db.collection('cost').insert(data, {}, function(err, doc) {
 					dbPool.release(_db);
 					callback(err, doc[0]);
@@ -267,8 +267,8 @@ db.createFee = function(file, data, costData, parentId, callback) {
 				fields : {
 					idPath : 1
 				}
-			}, function(err, parent) {console.log(['feeparent', parentId, parent]);
-				data.idPath = parent.idPath.push(parentId); 
+			}, function(err, parent) {
+				data.idPath = parent.idPath.concat(parentId); 
 				_db.collection('cost').insert(data, {}, function(err, doc) {
 					async.each(childFees, function(cfee, cb) {
 						me.createFee(file, cfee, costData, doc[0].id, cb)
