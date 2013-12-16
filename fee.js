@@ -53,8 +53,9 @@ Object.defineProperty(Fee.prototype, 'feeResult', {
 
 Fee.prototype.feesToFlushOnCreate = function(callback) {
 	var me = this;	
+	var file = me.file;
 	db.feesToFlushOnFeeCreate(me._data, function(err, nfees){
-		async.map(nfees, function(nfee, cb){cb(null, new Fee(nfee));}, callback);
+		async.map(nfees, function(nfee, cb){nfee.file = file; cb(null, new Fee(nfee));}, callback);
 	});
 }
 
@@ -142,6 +143,7 @@ Fee.prototype.del = function(callback) {
 
 Fee.get = function(file, id, callback) {
 	db.getFee(file, id, function(err, nfee) {
+		nfee.file = file;
 		callback(err, new Fee(nfee))
 	});
 }

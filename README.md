@@ -23,11 +23,11 @@ Loki
 
 # 实现建模
 ## basex
-
+![](doc/cost.png) ![](doc/fee.png)
 ## neo4j
-
+![](doc/neo.png)
 ## mongodb
-
+![](doc/mongo.png)
 ## mysql
 
 # 优化

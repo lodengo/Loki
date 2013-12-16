@@ -32,7 +32,7 @@ db.getCost = function(file, id, callback) {
 			_id : id
 		}, {
 			fields : {
-				idPath : -1,
+				ancestor : -1,
 				refFrom : -1
 			}
 		}, function(err, doc) {
@@ -53,7 +53,7 @@ db.insertCost = function(file, data, parentId, callback) {
 		if (parentId) {
 			data.parentId = parentId;
 			me.getCost(file, parentId, function(err, parent) {
-				data.idPath = parent.idPath.concat(parentId);
+				data.ancestor = parent.ancestor.concat(parentId);
 				_db.collection('cost').insert(data, {}, function(err, doc) {
 					dbPool.release(_db);
 					callback(err, doc[0]);
@@ -61,7 +61,7 @@ db.insertCost = function(file, data, parentId, callback) {
 			});
 		} else {
 			data.parentId = null;
-			data.idPath = [];
+			data.ancestor = [];
 			_db.collection('cost').insert(data, {}, function(err, doc) {
 				dbPool.release(_db);
 				callback(err, doc[0]);
@@ -77,7 +77,7 @@ db.deleteCost = function(file, costId, callback) {
 				_id : costId
 			}, {
 				nodeType : 'cost',
-				idPath : {
+				ancestor : {
 					$all : [ costId ]
 				}
 			}, {
@@ -85,7 +85,7 @@ db.deleteCost = function(file, costId, callback) {
 				$or : [ {
 					costId : costId
 				}, {
-					costIdPath : {
+					costAncestor : {
 						$all : [ costId ]
 					}
 				} ]
@@ -189,7 +189,7 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 				}
 			}, {
 				nodeType : 'fee',
-				costIdPath : {
+				costAncestor : {
 					$all : [ costId ]
 				},
 				feeExpr : {
@@ -248,11 +248,10 @@ db.createFee = function(file, data, costData, parentId, callback) {
 	var childFees = data.fee || [];
 	delete data.fee;
 
-	data.nodeType = 'fee';
-	data.file = file;
+	data.nodeType = 'fee';	
 	data.costId = costData.id;
 	data.costParentId = costData.parentId;
-	data.costIdPath = costData.idPath;
+	data.costAncestor = costData.ancestor;
 	data.costType = costData.type;
 	data.refTo = [];
 	data.refFrom = [];
@@ -265,10 +264,10 @@ db.createFee = function(file, data, costData, parentId, callback) {
 				_id : parentId
 			}, {
 				fields : {
-					idPath : 1
+					ancestor : 1
 				}
 			}, function(err, parent) {
-				data.idPath = parent.idPath.concat(parentId); 
+				data.ancestor = parent.ancestor.concat(parentId); 
 				_db.collection('cost').insert(data, {}, function(err, doc) {
 					async.each(childFees, function(cfee, cb) {
 						me.createFee(file, cfee, costData, doc[0].id, cb)
@@ -280,7 +279,7 @@ db.createFee = function(file, data, costData, parentId, callback) {
 			});
 		} else {
 			data.parentId = null;
-			data.idPath = [];
+			data.ancestor = [];
 			_db.collection('cost').insert(data, {}, function(err, doc) {
 				async.each(childFees, function(cfee, cb) {
 					me.createFee(file, cfee, costData, doc[0].id, cb)
@@ -329,7 +328,7 @@ db.deleteFee = function(file, id, callback) {
 			$or : [ {
 				_id : id
 			}, {
-				idPath : {
+				ancestor : {
 					$all : [ id ]
 				}
 			} ]

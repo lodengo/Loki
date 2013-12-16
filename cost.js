@@ -30,7 +30,7 @@ Cost.prototype.feesToFlushOnCreate = function(callback) {
 	var type = me.type;
 	var file = me.file;
 	db.feesToFlushOnCostCreate(me._data, function(err, nfees){
-		async.map(nfees, function(nfee, cb){cb(null, new Fee(nfee));}, callback);
+		async.map(nfees, function(nfee, cb){nfee.file = file; cb(null, new Fee(nfee));}, callback);
 	});
 }
 
@@ -40,7 +40,7 @@ Cost.prototype.feesToFlushOnUpdate = function(key, value, callback) {
 	var type = me.type;
 	var file = me.file;
 	db.feesToFlushOnCostUpdate(me._data, key, function(err, nfees){
-		async.map(nfees, function(nfee, cb){cb(null, new Fee(nfee));}, callback);
+		async.map(nfees, function(nfee, cb){nfee.file = file; cb(null, new Fee(nfee));}, callback);
 	});
 }
 
@@ -50,7 +50,7 @@ Cost.prototype.feesToFlushOnDelete = function(callback) {
 	var type = me.type;
 	var file = me.file;
 	db.feesToFlushOnCostDelete(me._data, function(err, nfees){
-		async.map(nfees, function(nfee, cb){cb(null, new Fee(nfee));}, callback);
+		async.map(nfees, function(nfee, cb){nfee.file = file; cb(null, new Fee(nfee));}, callback);
 	});
 }
 
@@ -89,18 +89,21 @@ Cost.prototype.createFee = function(data, feeParentId, callback){
 	var costType = me.type;
 	var file = me.file;
 	Fee.create(file, data, me._data, feeParentId, function(err, nfee){
+		nfee.file = file;
 		callback(err, new Fee(nfee));
 	});
 }
 
 Cost.get = function(file, id, callback){
 	db.getCost(file, id, function(err, ncost){
+		ncost.file = file;
 		callback(err, new Cost(ncost));
 	});	
 };
 
 Cost.create = function(file, data, parentId, callback){
 	db.insertCost(file, data, parentId, function(err, ncost){
+		ncost.file = file;
 		callback(err, new Cost(ncost));
 	});	
 };

@@ -49,8 +49,7 @@ db.getCost = function(file, id, callback){
 	});
 }
 
-db.insertCost = function(file, data, parentId, callback){
-	data.nodeType = 'cost';
+db.insertCost = function(file, data, parentId, callback){	
 	data.file = file;
 	if(parentId){
 		var query = "start parent=node({parentId}) create parent-[:costchild]->(node {data}) return node";
@@ -190,8 +189,7 @@ db.createFee = function(file, data, costData, parentId, callback){
 	
 	var costId = costData.id;
 	var costType = costData.type;
-	data.nodeType = 'fee';
-	data.file = file;
+		
 	data.costId = costId;
 	data.costType = costType;
 	

@@ -20,8 +20,7 @@ declare function cost:getCost($file, $id){
 declare updating function cost:insertCost($file, $data, $parentId){
   let $cost :=
   <cost>
-  <id>{random:uuid()}</id>
-  <file>{$file}</file>
+  <id>{random:uuid()}</id>  
   {$data/node()} 
   <fees></fees>
   </cost>
@@ -79,8 +78,7 @@ declare function cost:getFee($file, $id){
 };
 
 declare updating function cost:createFee($file, $data, $costId, $costType, $parentId){
-  let $info := <info>
-   <file>{$file}</file>
+  let $info := <info>  
    <costId>{$costId}</costId>
    <costType>{$costType}</costType></info>
    
