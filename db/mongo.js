@@ -27,7 +27,7 @@ db.createCostFile = function(data, callback) {
 }
 
 db.getCost = function(file, id, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').findOne({
 			_id : id
 		}, {
@@ -49,7 +49,7 @@ db.insertCost = function(file, data, parentId, callback) {
 	data._id = data.id = new ObjectID().toHexString();
 	data.refFrom = [];
 
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		if (parentId) {
 			data.parentId = parentId;
 			me.getCost(file, parentId, function(err, parent) {
@@ -71,7 +71,7 @@ db.insertCost = function(file, data, parentId, callback) {
 }
 
 db.deleteCost = function(file, costId, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		var selector = {
 			$or : [ {
 				_id : costId
@@ -99,7 +99,7 @@ db.deleteCost = function(file, costId, callback) {
 }
 
 db.setCostProperty = function(file, id, prop, value, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -114,7 +114,7 @@ db.setCostProperty = function(file, id, prop, value, callback) {
 }
 
 db.deleteCostProperty = function(file, id, prop, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -132,7 +132,7 @@ db.feesToFlushOnCostCreate = function(costData, callback) {
 	var costId = costData.id;
 	var parentId = costData.parentId;
 	var type = costData.type;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			$or : [ {
 				costId : costId,
@@ -141,7 +141,7 @@ db.feesToFlushOnCostCreate = function(costData, callback) {
 				nodeType : 'fee',
 				costId : parentId,
 				feeExpr : {
-					$regex : ".*cc.?\(" + type
+					$regex : ".*cc.?\\(" + type
 				}
 			}, {
 				nodeType : 'fee',
@@ -150,7 +150,7 @@ db.feesToFlushOnCostCreate = function(costData, callback) {
 					$ne : costId
 				},
 				feeExpr : {
-					$regex : ".*cs.?\("
+					$regex : ".*cs.?\\("
 				}
 			} ]
 		}, {}).toArray(function(err, docs) {
@@ -164,19 +164,19 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 	var costId = costData.id;
 	var parentId = costData.parentId;
 	var type = costData.type;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			$or : [ {
 				costId : costId,
 				nodeType : 'fee',
 				feeExpr : {
-					$regex : ".*cas\(" + key + "|c\(" + key
+					$regex : ".*cas\\(" + key + "|c\\(" + key
 				}
 			}, {
 				nodeType : 'fee',
 				costId : parentId,
 				feeExpr : {
-					$regex : ".*cc\(" + type + "," + key
+					$regex : ".*cc\\(" + type + "," + key
 				}
 			}, {
 				nodeType : 'fee',
@@ -185,7 +185,7 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 					$ne : costId
 				},
 				feeExpr : {
-					$regex : ".*cs\(" + key
+					$regex : ".*cs\\(" + key
 				}
 			}, {
 				nodeType : 'fee',
@@ -193,7 +193,7 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 					$all : [ costId ]
 				},
 				feeExpr : {
-					$regex : ".*cas\(" + key
+					$regex : ".*cas\\(" + key
 				}
 			} ]
 		}, {}).toArray(function(err, docs) {
@@ -207,13 +207,13 @@ db.feesToFlushOnCostDelete = function(costData, callback) {
 	var costId = costData.id;
 	var parentId = costData.parentId;
 	var type = costData.type;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			$or : [ {
 				nodeType : 'fee',
 				costId : parentId,
 				feeExpr : {
-					$regex : ".*cc.?\(" + type
+					$regex : ".*cc.?\\(" + type
 				}
 			}, {
 				nodeType : 'fee',
@@ -222,7 +222,7 @@ db.feesToFlushOnCostDelete = function(costData, callback) {
 					$ne : costId
 				},
 				feeExpr : {
-					$regex : ".*cs.?\("
+					$regex : ".*cs.?\\("
 				}
 			} ]
 		}, {}).toArray(function(err, docs) {
@@ -233,7 +233,7 @@ db.feesToFlushOnCostDelete = function(costData, callback) {
 }
 
 db.getFee = function(file, id, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').findOne({
 			_id : id
 		}, {}, function(err, doc) {
@@ -258,7 +258,7 @@ db.createFee = function(file, data, costData, parentId, callback) {
 	data.refFrom = [];
 	data._id = data.id = new ObjectID().toHexString();
 
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		if (parentId) {
 			data.parentId = parentId;
 			_db.collection('cost').findOne({
@@ -294,7 +294,7 @@ db.createFee = function(file, data, costData, parentId, callback) {
 }
 
 db.setFeeProperty = function(file, id, prop, value, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -309,7 +309,7 @@ db.setFeeProperty = function(file, id, prop, value, callback) {
 }
 
 db.deleteFeeProperty = function(file, id, prop, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -324,7 +324,7 @@ db.deleteFeeProperty = function(file, id, prop, callback) {
 }
 
 db.deleteFee = function(file, id, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').remove({
 			$or : [ {
 				_id : id
@@ -341,7 +341,7 @@ db.deleteFee = function(file, id, callback) {
 }
 
 db.setFeeResult = function(file, id, feeResult, callback) {
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -361,7 +361,7 @@ db.feesAdj = function(file, ids, callback) {
 
 db._feesAdj = function(file, ids, adj, callback){
 	var me = this;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({nodeType:'fee', id:{$in: ids}}, {}).toArray(function(err, docs) {
 			async.concat(docs, function(r, cb){
 				var id = r.id;
@@ -369,6 +369,7 @@ db._feesAdj = function(file, ids, adj, callback){
 				adj[id] = adj[id] ? adj[id].concat(tos) : tos;
 				cb(null, r.refFrom? r.refFrom : []);
 			}, function(err, froms){
+				dbPool.release(_db);
 				if(froms.length > 0){
 					me._feesAdj(file, froms, adj, callback);
 				}else{
@@ -387,26 +388,26 @@ db.feesToFlushOnFeeCreate = function(feeData, callback) {
 	var feeName = feeData.feeName;
 	var parentId = feeData.costParentId;
 
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			$or : [ {
 				nodeType : 'fee',
 				costId : costId,
 				feeExpr : {
-					$regex : ".*cf\("+feeName
+					$regex : ".*cf\\("+feeName
 				}
 			}, {
 				nodeType : 'fee',
 				costId: parentId,
 				feeExpr : {
-					$regex : ".*ccf\("+type+","+feeName
+					$regex : ".*ccf\\("+type+","+feeName
 				}
 			}, {
 				nodeType : 'fee',
 				costParentId:parentId,
 				costId: {$ne: costId},
 				feeExpr : {
-					$regex : ".*csf\("+feeName
+					$regex : ".*csf\\("+feeName
 				}
 			} ]
 		}, {}).toArray(function(err, docs) {
@@ -418,7 +419,7 @@ db.feesToFlushOnFeeCreate = function(feeData, callback) {
 
 db.createRefsTo = function(feeData, toIds, callback) {
 	var id = feeData.id;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -428,15 +429,15 @@ db.createRefsTo = function(feeData, toIds, callback) {
 				}
 			}
 		}, {}, function(err, data) {
-			_db.collection('cost').findAndModify({
+			_db.collection('cost').update({
 				_id : {
 					$in : toIds
 				}
-			}, [], {
+			}, {
 				$addToSet : {
 					refFrom : id
 				}
-			}, {}, function(err, data) {
+			}, {multi:true}, function(err, data) {
 				dbPool.release(_db);
 				callback(err, data);
 			});
@@ -446,7 +447,7 @@ db.createRefsTo = function(feeData, toIds, callback) {
 
 db.removeRefsTo = function(feeData, toIds, callback) {
 	var id = feeData.id;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -456,15 +457,15 @@ db.removeRefsTo = function(feeData, toIds, callback) {
 				}
 			}
 		}, {}, function(err, data) {
-			_db.collection('cost').findAndModify({
+			_db.collection('cost').update({
 				_id : {
 					$in : toIds
 				}
-			}, [], {
+			},  {
 				$pull : {
 					refFrom : id
 				}
-			}, {}, function(err, data) {
+			}, {multi:true}, function(err, data) {
 				dbPool.release(_db);
 				callback(err, data);
 			});
@@ -475,7 +476,7 @@ db.removeRefsTo = function(feeData, toIds, callback) {
 db.feeRefedToIds = function(feeData, callback) {
 	var id = feeData.id;
 	// callback(null, feeData.refTo);
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').findOne({
 			_id : id
 		}, {
@@ -491,14 +492,13 @@ db.feeRefedToIds = function(feeData, callback) {
 // ///////////////////////////////////////////////////////////////////
 db._C = function(feeData, prop, getId, callback) {
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {
+	var fields = {id:1};
+	fields[prop] = 1;
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			_id : costId
 		}, {
-			fields : {
-				id : 1,
-				prop : 1
-			}
+			fields : fields
 		}).toArray(function(err, docs) {
 			dbPool.release(_db);
 			var values = docs.map(function(e) {
@@ -511,7 +511,7 @@ db._C = function(feeData, prop, getId, callback) {
 
 db._CF = function(feeData, feeName, getId, callback) {
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			nodeType : 'fee',
 			costId : costId,
@@ -533,15 +533,14 @@ db._CF = function(feeData, feeName, getId, callback) {
 
 db._CC = function(feeData, type, prop, getId, callback) {
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {
+	var fields = {id:1};
+	fields[prop] = 1;
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			parentId : costId,
 			type : type
 		}, {
-			fields : {
-				id : 1,
-				prop : 1
-			}
+			fields : fields
 		}).toArray(function(err, docs) {
 			dbPool.release(_db);
 			var values = docs.map(function(e) {
@@ -554,7 +553,7 @@ db._CC = function(feeData, type, prop, getId, callback) {
 
 db._CCF = function(feeData, type, feeName, getId, callback) {
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			costParentId : costId,
 			costType : type,
@@ -577,17 +576,16 @@ db._CCF = function(feeData, type, feeName, getId, callback) {
 db._CS = function(feeData, prop, getId, callback) {
 	var parentId = feeData.costParentId;
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {
+	var fields = {id:1};
+	fields[prop] = 1;
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			parentId : parentId,
 			id : {
 				$ne : costId
 			}
 		}, {
-			fields : {
-				id : 1,
-				prop : 1
-			}
+			fields : fields
 		}).toArray(function(err, docs) {
 			dbPool.release(_db);
 			var values = docs.map(function(e) {
@@ -601,7 +599,7 @@ db._CS = function(feeData, prop, getId, callback) {
 db._CSF = function(feeData, feeName, getId, callback) {
 	var parentId = feeData.costParentId;
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			costParentId : parentId,
 			costId : {
@@ -632,9 +630,10 @@ db._CAS = function(feeData, prop, getId, callback) {
 db._cas = function(costId, prop, getId, callback){
 	var me = this;
 	if(!costId) return callback(null, []);
-	
-	dbPool.acquire(function(err, _db) {
-		_db.collection('cost').findOne({id:costId}, {}, function(err, doc){
+	var fields = {id:1};
+	fields[prop] = 1;
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+		_db.collection('cost').findOne({id:costId}, {fields : fields}, function(err, doc){
 			if(doc[prop]){
 				dbPool.release(_db);
 				var values = getId? [doc.id]: [doc[prop]];

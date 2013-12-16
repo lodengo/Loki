@@ -191,7 +191,7 @@ function run(callback){
 	arrPush(actions, "createFbfx", 8);	
 	arrPush(actions, "createQd", 16);	
 	arrPush(actions, "createDe", 32);	
-	arrPush(actions, "createGlj", 32);	
+	arrPush(actions, "createGlj", 64);	
 //	arrPush(actions, "modGcl", 5);
 //	arrPush(actions, "delNode", 2);	
 //	arrPush(actions, "createGlj", 32);
@@ -205,6 +205,11 @@ run(function(){
 	console.log(stats);	
 });
 
+//var Calc = require("./calc.js");
+//Calc.start('', [ '52ae6518af15163729877923', '52ae6518af15163729877932' ], function(err, data){
+//	
+//	console.log(data);
+//});
 
 
 
