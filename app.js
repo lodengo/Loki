@@ -1,5 +1,6 @@
 var Api = require("./api.js");
 var async = require('async');
+var util = require("./util.js");
 
 function Tester() {
 	this.file = ''; // cost file id
@@ -192,6 +193,7 @@ Tester.prototype.run = function(actions) {
 		if(err) console.log(['err:', err]);
 		console.log('done');
 		console.log(me.stats);
+		console.log(util.dbstats.stats());
 	});
 }
 

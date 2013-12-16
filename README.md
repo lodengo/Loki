@@ -7,6 +7,18 @@ Loki
 响应用户对模型的操作，准确及时地维护模型、数据的一致。
 ## 示例
 ![](doc/qm2.png)
+## 引用函数
+| *函数* | *说明* | *示例* | 
+|-------|---------|--------- |
+|f(prop)|fee的属性prop |f(费率) |
+|c(prop)|fee所属cost的属性prop|c(工程量)|
+|cf(feeName)|fee所属cost的名为feeName的feeResult|cf(人工费)|
+|cc(type,prop)|fee所属cost的type类child的属性prop | |
+|ccf(type,feeName)|fee所属cost的type类child的名为feeName的feeResult |ccf(人工,直接费)|
+|cs(prop)|fee所属cost的兄弟的prop属性 | |
+|csf(feeName)|fee所属cost的兄弟的名为feeName的feeResult | |
+|cas(prop)|fee所属cost自身或其祖先的prop属性 | |
+
 ## 用例
 ![](doc/usecases.png)
 # 选型

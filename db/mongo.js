@@ -18,7 +18,20 @@ var dbPool = poolModule.Pool({
 });
 
 var db = module.exports = function db() {
-
+//	dbPool.acquire(function(err, _db) {
+//		_db.cost.ensureIndex({parentId:1});
+//		_db.cost.ensureIndex({ancestor:1});
+//		_db.cost.ensureIndex({type:1});
+//		_db.cost.ensureIndex({refFrom:1});
+//		_db.cost.ensureIndex({costId:1});
+//		_db.cost.ensureIndex({costParentId:1});
+//		_db.cost.ensureIndex({costAncestor:1});
+//		_db.cost.ensureIndex({costType:1});
+//		_db.cost.ensureIndex({feeName:1});
+//		_db.cost.ensureIndex({feeExpr:1});
+//		_db.cost.ensureIndex({refTo:1});
+//		dbPool.release(_db);
+//	});
 };
 
 db.createCostFile = function(data, callback) {
@@ -76,12 +89,12 @@ db.deleteCost = function(file, costId, callback) {
 			$or : [ {
 				_id : costId
 			}, {
-				nodeType : 'cost',
+				//nodeType : 'cost',
 				ancestor : {
 					$all : [ costId ]
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				$or : [ {
 					costId : costId
 				}, {
@@ -136,15 +149,15 @@ db.feesToFlushOnCostCreate = function(costData, callback) {
 		_db.collection('cost').find({
 			$or : [ {
 				costId : costId,
-				nodeType : 'fee'
+				//nodeType : 'fee'
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costId : parentId,
 				feeExpr : {
 					$regex : ".*cc.?\\(" + type
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costParentId : parentId,
 				costId : {
 					$ne : costId
@@ -168,18 +181,18 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 		_db.collection('cost').find({
 			$or : [ {
 				costId : costId,
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				feeExpr : {
 					$regex : ".*cas\\(" + key + "|c\\(" + key
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costId : parentId,
 				feeExpr : {
 					$regex : ".*cc\\(" + type + "," + key
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costParentId : parentId,
 				costId : {
 					$ne : costId
@@ -188,7 +201,7 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 					$regex : ".*cs\\(" + key
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costAncestor : {
 					$all : [ costId ]
 				},
@@ -210,13 +223,13 @@ db.feesToFlushOnCostDelete = function(costData, callback) {
 	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			$or : [ {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costId : parentId,
 				feeExpr : {
 					$regex : ".*cc.?\\(" + type
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costParentId : parentId,
 				costId : {
 					$ne : costId
@@ -361,7 +374,7 @@ db.feesAdj = function(file, ids, callback) {
 db._feesAdj = function(file, ids, adj, callback){
 	var me = this;
 	dbPool.acquire(function(err, _db) {if(err) console.log(err);
-		_db.collection('cost').find({nodeType:'fee', id:{$in: ids}}, {}).toArray(function(err, docs) {
+		_db.collection('cost').find({_id:{$in: ids}}, {}).toArray(function(err, docs) {
 			async.concat(docs, function(r, cb){
 				var id = r.id;
 				var tos = r.refTo ? [].concat(r.refTo) : [];
@@ -390,19 +403,19 @@ db.feesToFlushOnFeeCreate = function(feeData, callback) {
 	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
 			$or : [ {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costId : costId,
 				feeExpr : {
 					$regex : ".*cf\\("+feeName
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costId: parentId,
 				feeExpr : {
 					$regex : ".*ccf\\("+type+","+feeName
 				}
 			}, {
-				nodeType : 'fee',
+				//nodeType : 'fee',
 				costParentId:parentId,
 				costId: {$ne: costId},
 				feeExpr : {
@@ -512,7 +525,7 @@ db._CF = function(feeData, feeName, getId, callback) {
 	var costId = feeData.costId;
 	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		_db.collection('cost').find({
-			nodeType : 'fee',
+			//nodeType : 'fee',
 			costId : costId,
 			feeName : feeName
 		}, {

@@ -1,3 +1,4 @@
+var util = require("../util.js");
 var neo4j = require('neo4j');
 var _db = new neo4j.GraphDatabase('http://localhost:7474');
 var async = require('async');
@@ -20,6 +21,7 @@ var db = module.exports = function db() {
 };
 
 db.query = function(query, params, callback) {	
+	var start = new Date()
 	var matches = query.match(/({{[^}]*}})/g);
 	matches && matches.forEach(function(str) {
 		var key = str.slice(2, -2);
@@ -28,7 +30,7 @@ db.query = function(query, params, callback) {
 	
 	_db.query(query, params, function(err, res){
 		if(err) console.dir([err, query]);	
-		//console.dir(query);	console.log(params); console.log(res);
+		util.dbstats.finish(start, query);
 		callback(err, res);
 	});	
 };
