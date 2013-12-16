@@ -58,8 +58,7 @@ Cost.prototype.update = function(prop, value, callback){
 	var me = this;
 	var id = me.id;
 	var file = me.file;
-	
-	console.log(me);
+		
 	var hasProp = this._data.hasOwnProperty(prop);
 	var valueNotNull = (value !== undefined) && (value !== null);
 	
