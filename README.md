@@ -1,5 +1,6 @@
 Loki
 ====
+![](doc/loki.jpg)
 # 问题
 ## 模型
 ![问题模型](doc/qm.png)
