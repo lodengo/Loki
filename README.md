@@ -21,7 +21,7 @@ Loki
 其他比较： http://db-engines.com/en/system/BaseX%3BMongoDB%3BNeo4j%3BMYSQL
 
 
-# 实现建模
+# 建模
 ## basex
 ![](doc/cost.png) ![](doc/fee.png)
 ## neo4j
@@ -31,6 +31,14 @@ Loki
 ## mysql
 
 # 优化
+| *优化* | *basex* | *neo4j* | *mongodb* | *mysql*|
+|-------|---------|--------- |-----------|-------|
+|服务器调优| | | | |
+|建模| | | | |
+|索引| | | | |
+|算法| | | | |
 
 # 测试
+| *测试* | *basex* | *neo4j* | *mongodb* | *mysql*|
+|-------|---------|--------- |-----------|-------|
 
