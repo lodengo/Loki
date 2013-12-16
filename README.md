@@ -17,14 +17,17 @@ Loki
 | 前端json与后端模型一致性 | 5 | 8 | 10 |3 |
 | 高可用性 | 5 | 8 | 10 |8 |
 | 效率| | | | |
-|其他比较|http://db-engines.com/en/system/BaseX%3BMongoDB%3BNeo4j%3BMYSQL
+
+其他比较： http://db-engines.com/en/system/BaseX%3BMongoDB%3BNeo4j%3BMYSQL
 
 
 # 实现建模
 ## basex
 
 ## neo4j
+
 ## mongodb
+
 ## mysql
 
 # 优化
