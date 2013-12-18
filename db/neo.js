@@ -75,7 +75,7 @@ db.insertCost = function(file, data, parentId, callback){
 }
 
 db.deleteCost = function(file, costId, callback){
-	var query = 'start cost=node({id})	match cost-[:fee|feechild|costchild*]->m with cost, m MATCH m-[r?]-(), cost-[r1?]-() delete cost, m, r, r1';
+	var query = 'start cost=node({id})	match cost-[:fee|feechild|costchild*]->m with cost, m OPTIONAL MATCH m-[r]-(), cost-[r1]-() delete cost, m, r, r1';
 	this.query(query, {id: costId}, callback);	
 }
 
@@ -235,7 +235,7 @@ db.deleteFeeProperty = function(file, id, prop, callback){
 }
 
 db.deleteFee = function(file, id, callback){
-	var query = 'start fee=node({id}) match fee-[:feechild*]->m with fee, m match m-[r?]-(), fee-[:r1?]-() delete fee, m, r, r1';
+	var query = 'start fee=node({id}) match fee-[:feechild*]->m with fee, m OPTIONAL match m-[r]-(), fee-[:r1]-() delete fee, m, r, r1';
 	this.query(query, {id: id}, callback);	
 }
 
@@ -303,7 +303,9 @@ db.feesToFlushOnFeeCreate = function(feeData, callback){
 
 db.createRefsTo = function(feeData, toIds, callback){
 	var me = this;
-	var id = feeData.id;
+	var id = feeData.id;	
+//	var query = 'start me=node({id}), to=node({nodes}) create me-[r:ref]->to';
+//	me.query(query, {id:id, nodes:toId}, callback);	
 	async.each(toIds, function(toId, cb){
 		var query = 'start me=node({id}), to=node({nodes}) create me-[r:ref]->to';
 		me.query(query, {id:id, nodes:toId}, cb);	
@@ -339,7 +341,7 @@ db._C = function(feeData, prop, getId, callback){
 
 db._CF = function(feeData, feeName, getId, callback) {
 	var costId = feeData.costId;
-	var query = 'start cost=node({costId}) match cost-[:fee|feechild*]->fees where fees.feeName! ={feeName} return id(fees) as id, fees.feeResult as value';
+	var query = 'start cost=node({costId}) match cost-[:fee|feechild*]->fees where fees.feeName ={feeName} return id(fees) as id, fees.feeResult as value';
 	this.query(query, {costId: costId, feeName:feeName}, function(err, data){
 		_cb(err, data, getId, callback);
 	});
@@ -347,7 +349,7 @@ db._CF = function(feeData, feeName, getId, callback) {
 
 db._CC = function(feeData, type, prop, getId, callback) {
 	var costId = feeData.costId;
-	var query = 'start cost=node({costId}) match cost-[:costchild]->child where child.type! = {type} and has(child.{{prop}}) return id(child) as id, child.{{prop}} as value';
+	var query = 'start cost=node({costId}) match cost-[:costchild]->child where child.type = {type} and has(child.{{prop}}) return id(child) as id, child.{{prop}} as value';
 	this.query(query, {costId: costId, type:type, prop:pName}, function(err, data){
 		_cb(err, data, getId, callback);
 	});
@@ -355,7 +357,7 @@ db._CC = function(feeData, type, prop, getId, callback) {
 
 db._CCF = function(feeData, type, feeName, getId, callback) {
 	var costId = feeData.costId;
-	var query = 'start cost=node({costId}) match cost-[:costchild]->child, child-[:fee|feechild*]->childfees where child.type! = {type} and childfees.feeName! = {feeName} return id(childfees) as id, childfees.feeResult as value';
+	var query = 'start cost=node({costId}) match cost-[:costchild]->child, child-[:fee|feechild*]->childfees where child.type = {type} and childfees.feeName = {feeName} return id(childfees) as id, childfees.feeResult as value';
 	this.query(query, {costId: costId, type:type, feeName:feeName}, function(err, data){
 		_cb(err, data, getId, callback);
 	});
@@ -371,7 +373,7 @@ db._CS = function(feeData, prop, getId, callback) {
 
 db._CSF = function(feeData, feeName, getId, callback) {
 	var costId = feeData.costId;
-	var query = 'start cost=node({costId}) match cost<-[:costchild]-parent, parent-[:costchild]->sibling, sibling-[:fee|feechild*]->siblingfees where sibling <> cost and siblingfees.feeName! ={feeName}  return id(siblingfees) as id, siblingfees.feeResult as value';
+	var query = 'start cost=node({costId}) match cost<-[:costchild]-parent, parent-[:costchild]->sibling, sibling-[:fee|feechild*]->siblingfees where sibling <> cost and siblingfees.feeName ={feeName}  return id(siblingfees) as id, siblingfees.feeResult as value';
 	this.query(query, {costId: costId, feeName:feeName}, function(err, data){
 		_cb(err, data, getId, callback);
 	});
@@ -379,7 +381,7 @@ db._CSF = function(feeData, feeName, getId, callback) {
 
 db._CAS = function(feeData, prop, getId, callback) {
 	var costId = feeData.costId;
-	var query = 'start cost=node({costId}) match cost<-[:costchild*]-ancestor return cost.{{prop}}? as s, id(ancestor) as a, ancestor.{{prop}}? as aa';
+	var query = 'start cost=node({costId}) match cost<-[:costchild*]-ancestor return cost.{{prop}} as s, id(ancestor) as a, ancestor.{{prop}} as aa';
 	this.query(query, {costId: costId, prop:prop}, function(err, data){
 		_cb(err, data, getId, callback);
 	});
