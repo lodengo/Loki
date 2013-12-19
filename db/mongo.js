@@ -35,7 +35,7 @@ var db = module.exports = function db() {
 };
 
 db.createCostFile = function(data, callback) {
-	var file = '';
+	var file = new ObjectID().toHexString();;
 	callback(null, file);
 }
 

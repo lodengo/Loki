@@ -37,7 +37,7 @@ Calc.prototype.calc = function(callback) {
 		try {
 			feeResult = math.eval(feeExpr);
 			feeResult = feeResult.toFixed(2);
-			console.log(me._fee.costType+'.'+me._fee.feeName+'('+me._fee.feeExpr+')='+feeResult);
+			//console.log(me._fee.costType+'.'+me._fee.feeName+'('+me._fee.feeExpr+')='+feeResult);
 		} catch (e) {
 			feeResult = 0;
 		}
