@@ -34,8 +34,13 @@ var db = module.exports = function db() {
 //	});
 };
 
+function objectId(){
+	//return new ObjectID().toHexString();
+	return require('node-uuid').v4();
+}
+
 db.createCostFile = function(data, callback) {
-	var file = new ObjectID().toHexString();;
+	var file = objectId();
 	callback(null, file);
 }
 
@@ -59,7 +64,7 @@ db.insertCost = function(file, data, parentId, callback) {
 	var me = this;
 	data.nodeType = 'cost';
 	data.file = file;
-	data._id = data.id = new ObjectID().toHexString();
+	data._id = data.id = objectId();
 	data.refFrom = [];
 
 	dbPool.acquire(function(err, _db) {if(err) console.log(err);
@@ -268,8 +273,7 @@ db.createFee = function(file, data, costData, parentId, callback) {
 	data.costType = costData.type;
 	data.refTo = [];
 	data.refFrom = [];
-	data._id = data.id = new ObjectID().toHexString();
-
+	
 	dbPool.acquire(function(err, _db) {if(err) console.log(err);
 		if (parentId) {
 			data.parentId = parentId;
@@ -281,7 +285,13 @@ db.createFee = function(file, data, costData, parentId, callback) {
 				}
 			}, function(err, parent) {
 				data.ancestor = parent.ancestor.concat(parentId); 
+				data._id = data.id = objectId();
 				_db.collection('cost').insert(data, {}, function(err, doc) {
+					if(err){
+						console.log(err);
+						dbPool.release(_db);
+						return callback(err, doc);
+					}
 					async.each(childFees, function(cfee, cb) {
 						me.createFee(file, cfee, costData, doc[0].id, cb)
 					}, function(err) {
@@ -293,7 +303,13 @@ db.createFee = function(file, data, costData, parentId, callback) {
 		} else {
 			data.parentId = null;
 			data.ancestor = [];
+			data._id = data.id = objectId();
 			_db.collection('cost').insert(data, {}, function(err, doc) {
+				if(err){
+					console.log(err);
+					dbPool.release(_db);
+					return callback(err, doc);
+				}
 				async.each(childFees, function(cfee, cb) {
 					me.createFee(file, cfee, costData, doc[0].id, cb)
 				}, function(err) {

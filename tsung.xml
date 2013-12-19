@@ -34,17 +34,17 @@
 				<http url="/ztgc" method="POST" version="1.1"></http>
 			</request>
 			<thinktime />	
-			<for from="1" to="10" incr="1" var="counter">
+			<for from="1" to="2" incr="1" var="counter">
 				<request>
 					<http url="/dxgc" method="POST" version="1.1"></http>
 				</request>
 				<thinktime />	
-				<for from="1" to="10" incr="1" var="counter">
+				<for from="1" to="2" incr="1" var="counter">
 					<request>
 						<http url="/dwgc" method="POST" version="1.1"></http>
 					</request>
 					<thinktime />	
-					<for from="1" to="10" incr="1" var="counter">
+					<for from="1" to="5" incr="1" var="counter">
 						<request>
 							<http url="/fbfx" method="POST" version="1.1"></http>
 						</request>
@@ -59,7 +59,7 @@
 									<http url="/de" method="POST" version="1.1"></http>
 								</request>
 								<thinktime />	
-								<for from="1" to="10" incr="1" var="counter">
+								<for from="1" to="5" incr="1" var="counter">
 									<request>
 										<http url="/glj" method="POST" version="1.1"></http>
 									</request>

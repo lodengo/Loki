@@ -89,6 +89,7 @@ Cost.prototype.createFee = function(data, feeParentId, callback){
 	var costType = me.type;
 	var file = me.file;
 	Fee.create(file, data, me._data, feeParentId, function(err, nfee){
+		if(err) return callback(err, nfee);
 		nfee.file = file;
 		callback(err, new Fee(nfee));
 	});
