@@ -14,7 +14,8 @@ var dbPool = poolModule.Pool({
 	destroy : function(db) {
 		db.close();
 	},
-	max : 1024
+	max : 1024,
+	log : false 
 });
 
 var db = module.exports = function db() {
@@ -35,8 +36,8 @@ var db = module.exports = function db() {
 };
 
 function objectId(){
-	//return new ObjectID().toHexString();
-	return require('node-uuid').v4();
+	return new ObjectID().toHexString();
+//	return require('node-uuid').v4();
 }
 
 db.createCostFile = function(data, callback) {
@@ -287,15 +288,10 @@ db.createFee = function(file, data, costData, parentId, callback) {
 				data.ancestor = parent.ancestor.concat(parentId); 
 				data._id = data.id = objectId();
 				_db.collection('cost').insert(data, {}, function(err, doc) {
-					if(err){
-						console.log(err);
-						dbPool.release(_db);
-						return callback(err, doc);
-					}
+					dbPool.release(_db);
 					async.each(childFees, function(cfee, cb) {
 						me.createFee(file, cfee, costData, doc[0].id, cb)
-					}, function(err) {
-						dbPool.release(_db);
+					}, function(err) {						
 						callback(err, doc[0]);
 					});
 				});
@@ -305,15 +301,10 @@ db.createFee = function(file, data, costData, parentId, callback) {
 			data.ancestor = [];
 			data._id = data.id = objectId();
 			_db.collection('cost').insert(data, {}, function(err, doc) {
-				if(err){
-					console.log(err);
-					dbPool.release(_db);
-					return callback(err, doc);
-				}
+				dbPool.release(_db);
 				async.each(childFees, function(cfee, cb) {
 					me.createFee(file, cfee, costData, doc[0].id, cb)
-				}, function(err) {
-					dbPool.release(_db);
+				}, function(err) {					
 					callback(err, doc[0]);
 				});
 			});
