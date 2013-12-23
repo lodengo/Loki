@@ -205,9 +205,9 @@ var actions = {
 	createDXgc: 2,
 	createDwgc: 4,
 	createFbfx: 8,
-	createQd: 16,
-	createDe: 32,
-	createGlj: 64	
+	createQd: 1600,
+	createDe: 3200,
+	createGlj: 6400	
 };
 tester.run(actions);
 

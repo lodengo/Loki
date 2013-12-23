@@ -1,5 +1,6 @@
 var async = require('async');
 var Server = require('mongodb').Server, Db = require('mongodb').Db, ObjectID = require('mongodb').ObjectID, ReplSetServers = require('mongodb').ReplSetServers, MongoClient = require('mongodb').MongoClient
+var util = require("../util.js");
 
 var poolModule = require('generic-pool');
 var dbPool = poolModule.Pool({
@@ -46,7 +47,7 @@ db.createCostFile = function(data, callback) {
 }
 
 db.getCost = function(file, id, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').findOne({
 			_id : id
 		}, {
@@ -56,6 +57,7 @@ db.getCost = function(file, id, callback) {
 			}
 		}, function(err, doc) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'getCost');
 			callback(err, doc);
 		});
 	});
@@ -68,13 +70,14 @@ db.insertCost = function(file, data, parentId, callback) {
 	data._id = data.id = objectId();
 	data.refFrom = [];
 
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		if (parentId) {
 			data.parentId = parentId;
 			me.getCost(file, parentId, function(err, parent) {
 				data.ancestor = parent.ancestor.concat(parentId);
 				_db.collection('cost').insert(data, {}, function(err, doc) {
 					dbPool.release(_db);
+					util.dbstats.finish(start, 'insertCost');
 					callback(err, doc[0]);
 				});
 			});
@@ -83,6 +86,7 @@ db.insertCost = function(file, data, parentId, callback) {
 			data.ancestor = [];
 			_db.collection('cost').insert(data, {}, function(err, doc) {
 				dbPool.release(_db);
+				util.dbstats.finish(start, 'insertCost');
 				callback(err, doc[0]);
 			});
 		}
@@ -90,7 +94,7 @@ db.insertCost = function(file, data, parentId, callback) {
 }
 
 db.deleteCost = function(file, costId, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		var selector = {
 			$or : [ {
 				_id : costId
@@ -112,13 +116,14 @@ db.deleteCost = function(file, costId, callback) {
 		};
 		_db.collection('cost').remove(selector, {}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'deleteCost');
 			callback(err, data);
 		});
 	});
 }
 
 db.setCostProperty = function(file, id, prop, value, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -127,13 +132,14 @@ db.setCostProperty = function(file, id, prop, value, callback) {
 			}
 		}, {}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'setCostProperty');
 			callback(err, data);
 		});
 	});
 }
 
 db.deleteCostProperty = function(file, id, prop, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -142,6 +148,7 @@ db.deleteCostProperty = function(file, id, prop, callback) {
 			}
 		}, {}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'deleteCostProperty');
 			callback(err, data);
 		});
 	});
@@ -151,7 +158,7 @@ db.feesToFlushOnCostCreate = function(costData, callback) {
 	var costId = costData.id;
 	var parentId = costData.parentId;
 	var type = costData.type;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			$or : [ {
 				costId : costId,
@@ -174,6 +181,7 @@ db.feesToFlushOnCostCreate = function(costData, callback) {
 			} ]
 		}, {}).toArray(function(err, docs) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'feesToFlushOnCostCreate');
 			callback(err, docs);
 		});
 	});
@@ -183,7 +191,7 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 	var costId = costData.id;
 	var parentId = costData.parentId;
 	var type = costData.type;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			$or : [ {
 				costId : costId,
@@ -217,6 +225,7 @@ db.feesToFlushOnCostUpdate = function(costData, key, callback) {
 			} ]
 		}, {}).toArray(function(err, docs) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'feesToFlushOnCostUpdate');
 			callback(err, docs);
 		});
 	});
@@ -226,7 +235,7 @@ db.feesToFlushOnCostDelete = function(costData, callback) {
 	var costId = costData.id;
 	var parentId = costData.parentId;
 	var type = costData.type;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			$or : [ {
 				//nodeType : 'fee',
@@ -246,17 +255,19 @@ db.feesToFlushOnCostDelete = function(costData, callback) {
 			} ]
 		}, {}).toArray(function(err, docs) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'feesToFlushOnCostDelete');
 			callback(err, docs);
 		});
 	});
 }
 
 db.getFee = function(file, id, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').findOne({
 			_id : id
 		}, {}, function(err, doc) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'getFee');
 			callback(err, doc);
 		});
 	});
@@ -275,7 +286,7 @@ db.createFee = function(file, data, costData, parentId, callback) {
 	data.refTo = [];
 	data.refFrom = [];
 	
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		if (parentId) {
 			data.parentId = parentId;
 			_db.collection('cost').findOne({
@@ -291,7 +302,8 @@ db.createFee = function(file, data, costData, parentId, callback) {
 					dbPool.release(_db);
 					async.each(childFees, function(cfee, cb) {
 						me.createFee(file, cfee, costData, doc[0].id, cb)
-					}, function(err) {						
+					}, function(err) {	
+						util.dbstats.finish(start, 'createFee');
 						callback(err, doc[0]);
 					});
 				});
@@ -304,7 +316,8 @@ db.createFee = function(file, data, costData, parentId, callback) {
 				dbPool.release(_db);
 				async.each(childFees, function(cfee, cb) {
 					me.createFee(file, cfee, costData, doc[0].id, cb)
-				}, function(err) {					
+				}, function(err) {	
+					util.dbstats.finish(start, 'createFee');
 					callback(err, doc[0]);
 				});
 			});
@@ -313,7 +326,7 @@ db.createFee = function(file, data, costData, parentId, callback) {
 }
 
 db.setFeeProperty = function(file, id, prop, value, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -322,13 +335,14 @@ db.setFeeProperty = function(file, id, prop, value, callback) {
 			}
 		}, {}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'setFeeProperty');
 			callback(err, data);
 		});
 	});
 }
 
 db.deleteFeeProperty = function(file, id, prop, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -337,13 +351,14 @@ db.deleteFeeProperty = function(file, id, prop, callback) {
 			}
 		}, {}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'deleteFeeProperty');
 			callback(err, data);
 		});
 	});
 }
 
 db.deleteFee = function(file, id, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').remove({
 			$or : [ {
 				_id : id
@@ -354,13 +369,14 @@ db.deleteFee = function(file, id, callback) {
 			} ]
 		}, {}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'deleteFee');
 			callback(err, data);
 		});
 	});
 }
 
 db.setFeeResult = function(file, id, feeResult, callback) {
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -369,6 +385,7 @@ db.setFeeResult = function(file, id, feeResult, callback) {
 			}
 		}, {}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'setFeeResult');
 			callback(err, data);
 		});
 	});
@@ -380,7 +397,7 @@ db.feesAdj = function(file, ids, callback) {
 
 db._feesAdj = function(file, ids, adj, callback){
 	var me = this;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({_id:{$in: ids}}, {}).toArray(function(err, docs) {
 			async.concat(docs, function(r, cb){
 				var id = r.id;
@@ -392,6 +409,7 @@ db._feesAdj = function(file, ids, adj, callback){
 				if(froms.length > 0){
 					me._feesAdj(file, froms, adj, callback);
 				}else{
+					util.dbstats.finish(start, 'feesAdj');
 					callback(err, adj);
 				}
 			});
@@ -407,7 +425,7 @@ db.feesToFlushOnFeeCreate = function(feeData, callback) {
 	var feeName = feeData.feeName;
 	var parentId = feeData.costParentId;
 
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			$or : [ {
 				//nodeType : 'fee',
@@ -431,6 +449,7 @@ db.feesToFlushOnFeeCreate = function(feeData, callback) {
 			} ]
 		}, {}).toArray(function(err, docs) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'feesToFlushOnFeeCreate');
 			callback(err, docs);
 		});
 	});
@@ -438,7 +457,7 @@ db.feesToFlushOnFeeCreate = function(feeData, callback) {
 
 db.createRefsTo = function(feeData, toIds, callback) {
 	var id = feeData.id;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -458,6 +477,7 @@ db.createRefsTo = function(feeData, toIds, callback) {
 				}
 			}, {multi:true}, function(err, data) {
 				dbPool.release(_db);
+				util.dbstats.finish(start, 'createRefsTo');
 				callback(err, data);
 			});
 		});
@@ -466,7 +486,7 @@ db.createRefsTo = function(feeData, toIds, callback) {
 
 db.removeRefsTo = function(feeData, toIds, callback) {
 	var id = feeData.id;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').update({
 			_id : id
 		}, {
@@ -486,6 +506,7 @@ db.removeRefsTo = function(feeData, toIds, callback) {
 				}
 			}, {multi:true}, function(err, data) {
 				dbPool.release(_db);
+				util.dbstats.finish(start, 'removeRefsTo');
 				callback(err, data);
 			});
 		});
@@ -495,7 +516,7 @@ db.removeRefsTo = function(feeData, toIds, callback) {
 db.feeRefedToIds = function(feeData, callback) {
 	var id = feeData.id;
 	// callback(null, feeData.refTo);
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').findOne({
 			_id : id
 		}, {
@@ -504,6 +525,7 @@ db.feeRefedToIds = function(feeData, callback) {
 			}
 		}, function(err, data) {
 			dbPool.release(_db);
+			util.dbstats.finish(start, 'feeRefedToIds');
 			callback(err, data.refTo);
 		});
 	});
@@ -513,7 +535,7 @@ db._C = function(feeData, prop, getId, callback) {
 	var costId = feeData.costId;
 	var fields = {id:1};
 	fields[prop] = 1;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			_id : costId
 		}, {
@@ -523,6 +545,7 @@ db._C = function(feeData, prop, getId, callback) {
 			var values = docs.map(function(e) {
 				return getId ? e.id : e[prop];
 			});
+			util.dbstats.finish(start, 'c');
 			callback(err, values);
 		});
 	});
@@ -530,7 +553,7 @@ db._C = function(feeData, prop, getId, callback) {
 
 db._CF = function(feeData, feeName, getId, callback) {
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			//nodeType : 'fee',
 			costId : costId,
@@ -545,6 +568,7 @@ db._CF = function(feeData, feeName, getId, callback) {
 			var values = docs.map(function(e) {
 				return getId ? e.id : e.feeResult;
 			});
+			util.dbstats.finish(start, 'cf');
 			callback(err, values);
 		});
 	});
@@ -554,7 +578,7 @@ db._CC = function(feeData, type, prop, getId, callback) {
 	var costId = feeData.costId;
 	var fields = {id:1};
 	fields[prop] = 1;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			parentId : costId,
 			type : type
@@ -565,6 +589,7 @@ db._CC = function(feeData, type, prop, getId, callback) {
 			var values = docs.map(function(e) {
 				return getId ? e.id : e[prop];
 			});
+			util.dbstats.finish(start, 'cc');
 			callback(err, values);
 		});
 	});
@@ -572,7 +597,7 @@ db._CC = function(feeData, type, prop, getId, callback) {
 
 db._CCF = function(feeData, type, feeName, getId, callback) {
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			costParentId : costId,
 			costType : type,
@@ -587,6 +612,7 @@ db._CCF = function(feeData, type, feeName, getId, callback) {
 			var values = docs.map(function(e) {
 				return getId ? e.id : e.feeResult;
 			});
+			util.dbstats.finish(start, 'ccf');
 			callback(err, values);
 		});
 	});
@@ -597,7 +623,7 @@ db._CS = function(feeData, prop, getId, callback) {
 	var costId = feeData.costId;
 	var fields = {id:1};
 	fields[prop] = 1;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			parentId : parentId,
 			id : {
@@ -610,6 +636,7 @@ db._CS = function(feeData, prop, getId, callback) {
 			var values = docs.map(function(e) {
 				return getId ? e.id : e[prop];
 			});
+			util.dbstats.finish(start, 'cs');
 			callback(err, values);
 		});
 	});
@@ -618,7 +645,7 @@ db._CS = function(feeData, prop, getId, callback) {
 db._CSF = function(feeData, feeName, getId, callback) {
 	var parentId = feeData.costParentId;
 	var costId = feeData.costId;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').find({
 			costParentId : parentId,
 			costId : {
@@ -635,6 +662,7 @@ db._CSF = function(feeData, feeName, getId, callback) {
 			var values = docs.map(function(e) {
 				return getId ? e.id : e.feeResult;
 			});
+			util.dbstats.finish(start, 'csf');
 			callback(err, values);
 		});
 	});
@@ -651,11 +679,12 @@ db._cas = function(costId, prop, getId, callback){
 	if(!costId) return callback(null, []);
 	var fields = {id:1};
 	fields[prop] = 1;
-	dbPool.acquire(function(err, _db) {if(err) console.log(err);
+	dbPool.acquire(function(err, _db) {if(err) console.log(err);var start = new Date();
 		_db.collection('cost').findOne({id:costId}, {fields : fields}, function(err, doc){
 			if(doc[prop]){
 				dbPool.release(_db);
 				var values = getId? [doc.id]: [doc[prop]];
+				util.dbstats.finish(start, 'cas');
 				callback(err, values);
 			}else{
 				var parentId = doc.parentId;				

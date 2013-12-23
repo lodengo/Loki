@@ -16,7 +16,7 @@
 	<load>
 		<arrivalphase phase="1" duration="2" unit="minute">
 			<!-- maxnumber：最大用户数；arrivalrate：每秒新增用户数；unit：单位秒-->
-			<users maxnumber="1000" arrivalrate="1" unit="second"></users>
+			<users maxnumber="1000" arrivalrate="1" unit="minute"></users>
 		</arrivalphase>
 	</load>
 	
